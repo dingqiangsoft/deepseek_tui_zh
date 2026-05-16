@@ -278,6 +278,7 @@ fn work_panel_lines(
     content_width: usize,
     max_rows: usize,
     palette_mode: palette::PaletteMode,
+    locale: crate::localization::Locale,
 ) -> Vec<Line<'static>> {
     let theme = Theme::for_palette_mode(palette_mode);
     let mut lines: Vec<Line<'static>> = Vec::with_capacity(max_rows.max(4));
@@ -307,7 +308,7 @@ fn work_panel_lines(
 
     if lines.is_empty() {
         lines.push(Line::from(Span::styled(
-            work_panel_empty_hint(content_width),
+            work_panel_empty_hint(content_width, locale),
             Style::default().fg(palette::TEXT_MUTED).italic(),
         )));
     }
@@ -523,8 +524,9 @@ fn push_work_strategy_lines(
 }
 
 #[must_use]
-fn work_panel_empty_hint(content_width: usize) -> String {
-    truncate_line_to_width("No active work", content_width)
+fn work_panel_empty_hint(content_width: usize, locale: crate::localization::Locale) -> String {
+    let text = crate::localization::tr(locale, crate::localization::MessageId::NoActiveWork);
+    truncate_line_to_width(text, content_width)
 }
 
 fn render_sidebar_work(f: &mut Frame, area: Rect, app: &App) {
@@ -540,9 +542,11 @@ fn render_sidebar_work(f: &mut Frame, area: Rect, app: &App) {
         content_width.max(1),
         usable_rows,
         app.ui_theme.mode,
+        app.ui_locale,
     );
 
-    render_sidebar_section(f, area, "Work", lines, app);
+    let title = crate::localization::tr(app.ui_locale, crate::localization::MessageId::SidebarWorkTitle);
+    render_sidebar_section(f, area, title, lines, app);
 }
 
 fn render_sidebar_tasks(f: &mut Frame, area: Rect, app: &App) {
@@ -554,7 +558,8 @@ fn render_sidebar_tasks(f: &mut Frame, area: Rect, app: &App) {
     let usable_rows = area.height.saturating_sub(3) as usize;
     let lines = task_panel_lines(app, content_width.max(1), usable_rows.max(1));
 
-    render_sidebar_section(f, area, "Tasks", lines, app);
+    let title = crate::localization::tr(app.ui_locale, crate::localization::MessageId::SidebarTasksTitle);
+    render_sidebar_section(f, area, title, lines, app);
 }
 
 #[derive(Debug, Clone)]
@@ -628,10 +633,21 @@ fn task_panel_lines(app: &App, content_width: usize, max_rows: usize) -> Vec<Lin
                 .duration_ms
                 .map(format_duration_ms)
                 .unwrap_or_else(|| "-".to_string());
+            
+            // Translate status for display
+            let status_display = match task.status.as_str() {
+                "queued" => "queued",
+                "running" => crate::localization::tr(app.ui_locale, crate::localization::MessageId::StatusRunning),
+                "completed" => crate::localization::tr(app.ui_locale, crate::localization::MessageId::StatusCompleted),
+                "failed" => crate::localization::tr(app.ui_locale, crate::localization::MessageId::StatusFailed),
+                "canceled" => "canceled",
+                other => other,
+            };
+            
             let label = format!(
                 "{} {} {}",
                 truncate_line_to_width(&task.id, 10),
-                task.status,
+                status_display,
                 duration
             );
             lines.push(Line::from(Span::styled(
@@ -678,8 +694,9 @@ fn task_panel_lines(app: &App, content_width: usize, max_rows: usize) -> Vec<Lin
             && active_rows.is_empty()
             && background_rows.is_empty())
     {
+        let no_tools_text = crate::localization::tr(app.ui_locale, crate::localization::MessageId::NoLiveTools);
         lines.push(Line::from(Span::styled(
-            "No live tools or background jobs",
+            no_tools_text,
             Style::default().fg(palette::TEXT_MUTED),
         )));
     }
@@ -1825,7 +1842,7 @@ mod tests {
 
     #[test]
     fn work_panel_empty_hint_stays_quiet_and_truncates() {
-        let hint = work_panel_empty_hint(10);
+        let hint = work_panel_empty_hint(10, crate::localization::Locale::En);
         assert!(
             hint.chars().count() <= 10,
             "hint width {} > 10: {hint:?}",
@@ -1874,7 +1891,7 @@ mod tests {
             ..SidebarWorkSummary::default()
         };
 
-        let text = lines_to_text(&work_panel_lines(&summary, 80, 16, PaletteMode::Dark));
+        let text = lines_to_text(&work_panel_lines(&summary, 80, 16, PaletteMode::Dark, crate::localization::Locale::En));
 
         assert!(
             text[0].starts_with("33% complete (1/3)"),
@@ -1910,7 +1927,7 @@ mod tests {
             ..SidebarWorkSummary::default()
         };
 
-        let text = lines_to_text(&work_panel_lines(&summary, 80, 6, PaletteMode::Dark));
+        let text = lines_to_text(&work_panel_lines(&summary, 80, 6, PaletteMode::Dark, crate::localization::Locale::En));
 
         assert!(
             text.iter()
@@ -1931,6 +1948,7 @@ mod tests {
             80,
             16,
             PaletteMode::Dark,
+            crate::localization::Locale::En,
         ));
         assert!(
             !empty_text.iter().any(|line| line.contains("Strategy")),
@@ -1941,7 +1959,7 @@ mod tests {
             strategy_explanation: Some("High-level sequencing".to_string()),
             ..SidebarWorkSummary::default()
         };
-        let text = lines_to_text(&work_panel_lines(&summary, 80, 16, PaletteMode::Dark));
+        let text = lines_to_text(&work_panel_lines(&summary, 80, 16, PaletteMode::Dark, crate::localization::Locale::En));
         assert!(
             text.iter().any(|line| line == "Strategy"),
             "non-empty plan should show strategy label: {text:?}"

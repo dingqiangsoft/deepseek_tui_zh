@@ -110,6 +110,7 @@ struct Cli {
 }
 
 #[derive(Debug, Subcommand)]
+#[allow(clippy::large_enum_variant)]
 enum Commands {
     /// Run interactive/non-interactive flows via the TUI binary.
     Run(RunArgs),
@@ -150,6 +151,15 @@ Common forwarded flags:
     Features(TuiPassthroughArgs),
     /// Run a local TUI server.
     Serve(TuiPassthroughArgs),
+    /// Query web-based AI services (Qianwen, Doubao).
+    Web {
+        /// Platform name (qianwen or doubao)
+        #[arg(value_name = "PLATFORM")]
+        platform: String,
+        /// Question to ask the AI
+        #[arg(value_name = "QUESTION", trailing_var_arg = true, allow_hyphen_values = true)]
+        question: Vec<String>,
+    },
     /// Generate shell completions for the TUI binary.
     Completions(TuiPassthroughArgs),
     /// Save a provider API key to the shared user config file.
@@ -503,6 +513,12 @@ fn run() -> Result<()> {
         Some(Commands::Serve(args)) => {
             let resolved_runtime = resolve_runtime_for_dispatch(&mut store, &runtime_overrides);
             delegate_to_tui(&cli, &resolved_runtime, tui_args("serve", args))
+        }
+        Some(Commands::Web { platform, question }) => {
+            let resolved_runtime = resolve_runtime_for_dispatch(&mut store, &runtime_overrides);
+            let mut args_vec = vec!["web".to_string(), platform];
+            args_vec.extend(question);
+            delegate_to_tui(&cli, &resolved_runtime, args_vec)
         }
         Some(Commands::Completions(args)) => {
             let resolved_runtime = resolve_runtime_for_dispatch(&mut store, &runtime_overrides);

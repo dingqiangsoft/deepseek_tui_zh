@@ -599,7 +599,7 @@ pub fn system_prompt_for_mode_with_context_skills_session_and_approval(
     // 1–2. Mode prompt + project context.
     // `load_project_context_with_parents` auto-generates .deepseek/instructions.md
     // when no context file exists, so the fallback should always be available.
-    let mut full_prompt = if let Some(project_block) = project_context.as_system_block() {
+    let mut full_prompt = if let Some(project_block) = project_context.as_ref().and_then(|ctx| ctx.as_system_block()) {
         format!("{}\n\n{}", mode_prompt, project_block)
     } else {
         // Extremely unlikely: context generation failed (e.g. filesystem error).
@@ -747,7 +747,7 @@ pub fn system_prompt_for_mode_with_context_skills_session_and_approval(
 /// Build a system prompt with explicit project context
 pub fn build_system_prompt(base: &str, project_context: Option<&ProjectContext>) -> SystemPrompt {
     let full_prompt =
-        match project_context.and_then(super::project_context::ProjectContext::as_system_block) {
+        match project_context.and_then(|ctx| ctx.as_system_block()) {
             Some(project_block) => format!("{}\n\n{}", base.trim(), project_block),
             None => base.trim().to_string(),
         };

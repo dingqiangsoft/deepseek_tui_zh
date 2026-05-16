@@ -7030,7 +7030,8 @@ fn activity_detail_text(app: &App, cell_index: usize, width: u16) -> Option<Stri
     }
 
     sections.push(format!(
-        "Activity: {}",
+        "{} {}",
+        crate::localization::tr(app.ui_locale, crate::localization::MessageId::ActivityLabel),
         activity_cell_label(app, cell_index, cell)
     ));
 
@@ -7133,9 +7134,10 @@ fn reasoning_timeline_text(app: &App, selected_cell_index: usize) -> Option<Stri
 }
 
 fn activity_cell_label(app: &App, cell_index: usize, cell: &HistoryCell) -> String {
+    use crate::localization::{tr, MessageId};
     match cell {
-        HistoryCell::Thinking { .. } => "thinking".to_string(),
-        HistoryCell::Error { .. } => "error".to_string(),
+        HistoryCell::Thinking { .. } => tr(app.ui_locale, MessageId::StatusRunning).to_string(),
+        HistoryCell::Error { .. } => tr(app.ui_locale, MessageId::StatusError).to_string(),
         HistoryCell::SubAgent(_) => "sub-agent".to_string(),
         HistoryCell::Tool(_) => {
             detail_target_label(app, cell_index).unwrap_or_else(|| "tool activity".to_string())
@@ -7151,11 +7153,8 @@ fn activity_status_line(cell: &HistoryCell) -> Option<String> {
             duration_secs,
             ..
         } => {
-            let mut line = if *streaming {
-                "Status: running".to_string()
-            } else {
-                "Status: done".to_string()
-            };
+            let status_text = if *streaming { "running" } else { "completed" };
+            let mut line = format!("Status: {}", status_text);
             if let Some(duration_secs) = duration_secs {
                 line.push_str(" · ");
                 line.push_str(&format!("{duration_secs:.1}s"));
@@ -7227,7 +7226,7 @@ fn tool_duration_for_activity(tool: &ToolCell) -> Option<u64> {
 fn activity_status_label(status: ToolStatus) -> &'static str {
     match status {
         ToolStatus::Running => "running",
-        ToolStatus::Success => "done",
+        ToolStatus::Success => "completed",
         ToolStatus::Failed => "failed",
     }
 }

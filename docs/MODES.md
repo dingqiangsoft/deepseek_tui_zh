@@ -7,16 +7,45 @@ DeepSeek TUI has two related concepts:
 
 ## TUI Modes
 
-Press `Tab` to complete composer menus, queue a draft as a next-turn follow-up
-while a turn is running, or cycle through the visible modes when the composer is
-otherwise idle: **Plan → Agent → YOLO → Plan**.
-Press `Shift+Tab` to cycle reasoning effort.
-Run `/mode` to open the mode picker, or switch directly with `/mode agent`,
-`/mode plan`, `/mode yolo`, `/mode 1`, `/mode 2`, or `/mode 3`.
+### 切换模式的方法
 
-- **Plan**: design-first prompting. Read-only investigation tools stay available; shell and patch execution stay off. Use this when you want to think out loud and produce a plan to hand to a human (yourself later, or a reviewer).
-- **Agent**: multi-step tool use. Approvals for shell and paid tools (file writes are allowed without a prompt).
-- **YOLO**: enables shell + trust mode and auto-approves all tools. Use only in trusted repos.
+#### 方法 1: 快捷键
+
+- **`Tab`**: 循环切换模式（Plan → Agent → YOLO → Plan）
+- **`Shift+Tab`**: 循环切换推理强度（off → high → max → off）
+
+#### 方法 2: Slash 命令
+
+```bash
+# 打开模式选择器
+/mode
+
+# 直接切换到指定模式
+/mode plan      # 切换到 Plan 模式
+/mode agent     # 切换到 Agent 模式
+/mode yolo      # 切换到 YOLO 模式
+
+# 使用数字快捷方式
+/mode 1         # = Plan 模式
+/mode 2         # = Agent 模式
+/mode 3         # = YOLO 模式
+```
+
+#### 方法 3: 启动参数
+
+```bash
+# 启动时直接进入 YOLO 模式
+deepseek --yolo
+
+# 启动时指定模式
+deepseek --mode agent
+```
+
+### 模式说明
+
+- **Plan** (计划模式): 设计优先。只读工具可用，Shell 和文件写入关闭。适合思考和制定计划。
+- **Agent** (代理模式): 多步工具使用。Shell 和付费工具需要批准，文件写入允许。
+- **YOLO** (自由模式): 自动批准所有工具，启用 Shell 和信任模式。仅在可信仓库使用。
 
 All three modes have access to persistent RLM sessions through `rlm_open`, `rlm_eval`, `rlm_configure`, and `rlm_close`. Inside an RLM Python REPL, `sub_query_batch` fans out 1-16 cheap parallel child calls pinned to `deepseek-v4-flash`. The model reaches for it when work is too large or repetitive for the parent transcript.
 
@@ -34,20 +63,71 @@ All three modes have access to persistent RLM sessions through `rlm_open`, `rlm_
 - Clear the current input if text is present.
 - Otherwise it is a no-op.
 
-## Approval Mode
+## Approval Mode (批准模式)
 
-You can override approval behavior at runtime:
+### 设置方法
 
-```text
+#### 方法 1: 使用 /config 命令
+
+```bash
+# 查看当前配置
 /config
-# edit the approval_mode row to: suggest | auto | never
+
+# 设置批准模式（编辑 approval_mode 行）
+/config approval_mode auto      # 自动批准所有工具
+/config approval_mode suggest   # 建议批准（默认）
+/config approval_mode never     # 从不执行需要批准的工具
 ```
 
-Legacy note: `/set approval_mode ...` was retired in favor of `/config`.
+#### 方法 2: 使用别名
 
-- `suggest` (default): uses the per-mode rules above.
-- `auto`: auto-approves all tools (similar to YOLO approval behavior, but without forcing YOLO mode).
-- `never`: blocks any tool that isn't considered safe/read-only.
+```bash
+# 这些命令等价于 /config approval_mode suggest
+/config approval_mode on-request
+/config approval_mode untrusted
+
+# 这些命令等价于 /config approval_mode never
+/config approval_mode deny
+/config approval_mode denied
+```
+
+### 批准模式说明
+
+| 模式 | 说明 | 适用场景 |
+|------|------|---------|
+| `suggest` (默认) | 非安全工具需要确认 | 日常使用，安全优先 |
+| `auto` | 自动批准所有工具 | 高效开发，可信环境 |
+| `never` | 阻止所有需要批准的工具 | 只读场景，严格安全 |
+
+### 与 TUI 模式的关系
+
+- **Plan 模式**: 无论 approval_mode 如何，Shell 和写入工具都被禁用
+- **Agent 模式**: 遵循 approval_mode 设置
+- **YOLO 模式**: 自动设置为 `auto`，忽略 approval_mode 设置
+
+### 示例
+
+```bash
+# 场景 1: 高效开发（自动批准）
+/mode agent
+/config approval_mode auto
+
+# 场景 2: 安全优先（每次确认）
+/mode agent
+/config approval_mode suggest
+
+# 场景 3: 只读调查
+/mode plan
+# 无需设置，Plan 模式本身就不允许写入
+
+# 场景 4: 完全自由
+/mode yolo
+# 自动启用 auto 批准
+```
+
+---
+
+**历史说明**: `/set approval_mode ...` 命令已废弃，请使用 `/config` 代替。
 
 ## Small-Screen Status Behavior
 

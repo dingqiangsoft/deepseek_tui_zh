@@ -402,6 +402,46 @@ pub fn set_config_value(app: &mut App, key: &str, value: &str, persist: bool) ->
             );
         }
         "approval_mode" | "approval" => {
+            // 特殊处理：approval_mode agent/auto/plan 等模式名称
+            // 自动切换到对应的 TUI 模式
+            let value_lower = value.trim().to_ascii_lowercase();
+            
+            // 检查是否是模式名称（agent/plan/yolo）
+            if matches!(value_lower.as_str(), "agent" | "plan" | "yolo") {
+                // 解析目标模式
+                let target_mode = match value_lower.as_str() {
+                    "agent" => AppMode::Agent,
+                    "plan" => AppMode::Plan,
+                    "yolo" => AppMode::Yolo,
+                    _ => unreachable!(),
+                };
+                
+                // 切换模式
+                app.set_mode(target_mode);
+                
+                // 根据模式设置对应的 approval_mode
+                let approval = match target_mode {
+                    AppMode::Yolo => ApprovalMode::Auto,
+                    AppMode::Agent => ApprovalMode::Suggest,
+                    AppMode::Plan => ApprovalMode::Never,
+                };
+                app.approval_mode = approval;
+                
+                // Agent 和 Yolo 模式自动启用 allow_shell（Plan 模式不启用）
+                if matches!(target_mode, AppMode::Agent | AppMode::Yolo) {
+                    app.allow_shell = true;
+                }
+                
+                return CommandResult::with_message_and_action(
+                    format!("Switched to {} mode (approval_mode = {}, allow_shell = {})", 
+                            target_mode.as_setting(), 
+                            approval.label(),
+                            app.allow_shell),
+                    AppAction::UpdateCompaction(app.compaction_config()),
+                );
+            }
+            
+            // 标准的 approval_mode 值处理
             let mode = ApprovalMode::from_config_value(value);
             return match mode {
                 Some(m) => {
@@ -409,7 +449,7 @@ pub fn set_config_value(app: &mut App, key: &str, value: &str, persist: bool) ->
                     CommandResult::message(format!("approval_mode = {}", m.label()))
                 }
                 None => CommandResult::error(
-                    "Invalid approval_mode. Use: auto, suggest/on-request/untrusted, never/deny",
+                    "Invalid approval_mode. Use: auto, suggest/on-request/untrusted, never/deny, or agent/plan/yolo to switch modes",
                 ),
             };
         }
@@ -496,6 +536,11 @@ pub fn set_config_value(app: &mut App, key: &str, value: &str, persist: bool) ->
             app.ui_locale = resolve_locale(&settings.locale);
             app.mark_history_updated();
             app.needs_redraw = true;
+            // Show confirmation message
+            app.status_message = Some(format!(
+                "Note locale = {} (saved)",
+                app.ui_locale.tag()
+            ));
         }
         "theme" | "ui_theme" | "background_color" | "background" | "bg" => {
             app.theme_id = crate::palette::ThemeId::from_name(&settings.theme)
@@ -1804,6 +1849,43 @@ mod tests {
         let result = set_config(&mut app, Some("approval_mode never"));
         assert!(result.message.is_some());
         assert_eq!(app.approval_mode, ApprovalMode::Never);
+    }
+
+    #[test]
+    fn test_set_approval_mode_switches_tui_mode() {
+        // 测试 approval_mode agent 切换到 Agent 模式（自动启用 allow_shell）
+        let mut app = create_test_app();
+        app.mode = AppMode::Plan; // 直接设置模式，不调用 set_mode
+        app.allow_shell = false; // 确保初始为 false
+        
+        let result = set_config(&mut app, Some("approval_mode agent"));
+        assert!(result.message.is_some());
+        let msg = result.message.unwrap();
+        assert!(msg.contains("Switched to agent mode"));
+        assert!(msg.contains("allow_shell = true"));
+        assert_eq!(app.mode, AppMode::Agent);
+        assert_eq!(app.approval_mode, ApprovalMode::Suggest);
+        assert!(app.allow_shell); // 验证 allow_shell 已启用
+
+        // 测试 approval_mode yolo 切换到 YOLO 模式（自动启用 allow_shell）
+        let result = set_config(&mut app, Some("approval_mode yolo"));
+        assert!(result.message.is_some());
+        let msg = result.message.unwrap();
+        assert!(msg.contains("Switched to yolo mode"));
+        assert!(msg.contains("allow_shell = true"));
+        assert_eq!(app.mode, AppMode::Yolo);
+        assert_eq!(app.approval_mode, ApprovalMode::Auto);
+        assert!(app.allow_shell);
+
+        // 测试 approval_mode plan 切换到 Plan 模式（不修改 allow_shell）
+        app.allow_shell = true; // 保持为 true（set_mode 不会重置它）
+        let result = set_config(&mut app, Some("approval_mode plan"));
+        assert!(result.message.is_some());
+        let msg = result.message.unwrap();
+        assert!(msg.contains("Switched to plan mode"));
+        assert_eq!(app.mode, AppMode::Plan);
+        assert_eq!(app.approval_mode, ApprovalMode::Never);
+        // 注意：切换到 Plan 模式不会自动重置 allow_shell，因为 set_mode 不处理这个
     }
 
     #[test]

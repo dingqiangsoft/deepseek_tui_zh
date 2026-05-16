@@ -1,0 +1,38 @@
+[package]
+name = "deepseek-aiwebllm"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.88"
+description = "Web LLM integration module for DeepSeek TUI - supports Qianwen, Doubao, GitHub Models, Gitee AI"
+authors = ["DeepSeek TUI Team"]
+license = "MIT"
+repository = "https://github.com/deepseektuizh/deepseektuizh"
+
+[dependencies]
+# HTTP 客户端 + Cookie/JWT 支持
+reqwest = { version = "0.12", features = ["json", "cookies"] }
+headless_chrome = { version = "1.0", default-features = false, features = ["rustls"] }
+tokio = { version = "1", features = ["full"] }
+
+# CLI 解析
+clap = { version = "4.5", features = ["derive"] }
+
+# 序列化
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# 随机数生成
+rand = "0.8"
+
+# 错误处理
+thiserror = "2.0"
+tracing = "0.1"
+chrono = { version = "0.4", features = ["serde"] }
+sha2 = "0.10"
+similarity = "0.2"
+lru = "0.12"
+deepseek-config = { path = "../config" }
+
+[dev-dependencies]
+tokio-test = "0.4"
+wiremock = "0.5"

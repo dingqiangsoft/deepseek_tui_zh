@@ -751,11 +751,7 @@ impl Engine {
                     self.config.model.clone_from(&self.session.model);
                     self.config.workspace = workspace.clone();
                     let ctx = crate::project_context::load_project_context_with_parents(&workspace);
-                    self.session.project_context = if ctx.has_instructions() {
-                        Some(ctx)
-                    } else {
-                        None
-                    };
+                    self.session.project_context = ctx;
                     self.session.rebuild_working_set();
                     self.rehydrate_latest_canonical_state();
                     self.emit_session_updated().await;

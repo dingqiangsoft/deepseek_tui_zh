@@ -132,7 +132,7 @@ impl Session {
     ) -> Self {
         // Load project context from AGENTS.md, CLAUDE.md, etc.
         let project_context = load_project_context_with_parents(&workspace);
-        let has_context = project_context.has_instructions();
+        let has_context = project_context.is_some();
 
         Self {
             model,
@@ -151,11 +151,7 @@ impl Session {
             notes_path,
             mcp_config_path,
             id: uuid::Uuid::new_v4().to_string(),
-            project_context: if has_context {
-                Some(project_context)
-            } else {
-                None
-            },
+            project_context,
             last_system_prompt_hash: None,
             working_set: WorkingSet::default(),
             cycle_count: 0,

@@ -247,6 +247,7 @@ pub enum MessageId {
     CmdAttachDescription,
     CmdAnchorDescription,
     CmdCacheDescription,
+    CmdWebDescription,
     CmdChangeDescription,
     CmdChangeHeader,
     CmdChangeTranslationQueued,
@@ -451,6 +452,20 @@ pub enum MessageId {
     OnboardTipsLine4,
     OnboardTipsFooterEnter,
     OnboardTipsFooterAction,
+    // Sidebar and task panel labels.
+    SidebarTasksTitle,
+    StatusFailed,
+    StatusCompleted,
+    StatusRunning,
+    StatusError,
+    ActivityLabel,
+    NoLiveTools,
+    BackgroundJobs,
+    SidebarWorkTitle,
+    NoActiveWork,
+    ThinkingIdle,
+    MoreReasoningIn,
+    FullReasoningIn,
 }
 
 #[allow(dead_code)]
@@ -485,6 +500,7 @@ pub const ALL_MESSAGE_IDS: &[MessageId] = &[
     MessageId::CmdAnchorDescription,
     MessageId::CmdAttachDescription,
     MessageId::CmdCacheDescription,
+    MessageId::CmdWebDescription,
     MessageId::CmdClearDescription,
     MessageId::CmdCompactDescription,
     MessageId::CmdConfigDescription,
@@ -683,6 +699,19 @@ pub const ALL_MESSAGE_IDS: &[MessageId] = &[
     MessageId::OnboardTipsLine4,
     MessageId::OnboardTipsFooterEnter,
     MessageId::OnboardTipsFooterAction,
+    MessageId::SidebarTasksTitle,
+    MessageId::StatusFailed,
+    MessageId::StatusCompleted,
+    MessageId::StatusRunning,
+    MessageId::StatusError,
+    MessageId::ActivityLabel,
+    MessageId::NoLiveTools,
+    MessageId::BackgroundJobs,
+    MessageId::SidebarWorkTitle,
+    MessageId::NoActiveWork,
+    MessageId::ThinkingIdle,
+    MessageId::MoreReasoningIn,
+    MessageId::FullReasoningIn,
 ];
 
 pub fn tr(locale: Locale, id: MessageId) -> &'static str {
@@ -900,6 +929,9 @@ fn english(id: MessageId) -> &'static str {
         }
         MessageId::CmdCacheDescription => {
             "Show DeepSeek prefix-cache hit/miss stats for the last N turns"
+        }
+        MessageId::CmdWebDescription => {
+            "Query web-based AI services (Qianwen, Doubao) via browser automation"
         }
         MessageId::CmdChangeDescription => "Show the latest changelog entry",
         MessageId::CmdChangeHeader => "Latest Changelog",
@@ -1207,6 +1239,22 @@ fn english(id: MessageId) -> &'static str {
         }
         MessageId::OnboardTipsFooterEnter => "Press Enter",
         MessageId::OnboardTipsFooterAction => " to open the workspace",
+        // Sidebar and task panel labels.
+        MessageId::SidebarTasksTitle => "Tasks",
+        MessageId::StatusFailed => "failed",
+        MessageId::StatusCompleted => "completed",
+        MessageId::StatusRunning => "running",
+        MessageId::StatusError => "error",
+        MessageId::ActivityLabel => "Activity:",
+        MessageId::NoLiveTools => "No live tools or background jobs",
+        MessageId::BackgroundJobs => "background jobs",
+        // Sidebar work panel.
+        MessageId::SidebarWorkTitle => "Work",
+        MessageId::NoActiveWork => "No active work",
+        MessageId::ThinkingIdle => "thinking idle",
+        MessageId::MoreReasoningIn => "More reasoning in Ctrl+O",
+        MessageId::FullReasoningIn => "Full reasoning in Ctrl+O",
+        MessageId::CmdWebDescription => "Send message to Web LLM",
     }
 }
 
@@ -1277,6 +1325,9 @@ fn japanese(id: MessageId) -> Option<&'static str> {
         }
         MessageId::CmdCacheDescription => {
             "直近 N ターンの DeepSeek プレフィックスキャッシュのヒット/ミス統計を表示"
+        }
+        MessageId::CmdWebDescription => {
+            "ブラウザ自動化で Web ベースの AI サービス（通义千问、豆包）に問い合わせ"
         }
         MessageId::CmdChangeDescription => "最新の更新履歴を表示",
         MessageId::CmdChangeHeader => "最新の更新履歴",
@@ -1591,6 +1642,22 @@ fn japanese(id: MessageId) -> Option<&'static str> {
         }
         MessageId::OnboardTipsFooterEnter => "Enter を押す",
         MessageId::OnboardTipsFooterAction => " とワークスペースが開きます",
+        // Sidebar and task panel labels.
+        MessageId::SidebarTasksTitle => "タスク",
+        MessageId::StatusFailed => "失敗",
+        MessageId::StatusCompleted => "完了",
+        MessageId::StatusRunning => "実行中",
+        MessageId::StatusError => "エラー",
+        MessageId::ActivityLabel => "アクティビティ：",
+        MessageId::NoLiveTools => "アクティブなツールまたはバックグラウンドジョブはありません",
+        MessageId::BackgroundJobs => "バックグラウンドジョブ",
+        // Sidebar work panel.
+        MessageId::SidebarWorkTitle => "ワーク",
+        MessageId::NoActiveWork => "アクティブなワークなし",
+        MessageId::ThinkingIdle => "思考アイドル",
+        MessageId::MoreReasoningIn => "Ctrl+Oでさらに推理",
+        MessageId::FullReasoningIn => "Ctrl+Oで完全な推理",
+        MessageId::CmdWebDescription => "Web LLMにメッセージを送信",
     })
 }
 
@@ -1630,6 +1697,7 @@ fn chinese_simplified(id: MessageId) -> Option<&'static str> {
         MessageId::CmdAnchorDescription => "钉选关键事实，在压缩后自动注入上下文",
         MessageId::CmdAttachDescription => "附加图片或视频媒体；文本文件或目录请使用 @path",
         MessageId::CmdCacheDescription => "显示最近 N 轮的 DeepSeek 前缀缓存命中/未命中统计",
+        MessageId::CmdWebDescription => "通过浏览器自动化查询网页 AI 服务（千问、豆包）",
         MessageId::CmdChangeDescription => "显示最新的更新日志",
         MessageId::CmdChangeHeader => "最新更新日志",
         MessageId::CmdChangeTranslationQueued => {
@@ -1895,6 +1963,22 @@ fn chinese_simplified(id: MessageId) -> Option<&'static str> {
         MessageId::OnboardTipsLine4 => "Ctrl+R 恢复历史会话，Esc 退出当前输入或弹层。",
         MessageId::OnboardTipsFooterEnter => "按 Enter",
         MessageId::OnboardTipsFooterAction => " 进入工作区",
+        // Sidebar and task panel labels.
+        MessageId::SidebarTasksTitle => "任务",
+        MessageId::StatusFailed => "失败",
+        MessageId::StatusCompleted => "完成",
+        MessageId::StatusRunning => "运行中",
+        MessageId::StatusError => "错误",
+        MessageId::ActivityLabel => "活动：",
+        MessageId::NoLiveTools => "没有活跃的工具或后台任务",
+        MessageId::BackgroundJobs => "后台任务",
+        // Sidebar work panel.
+        MessageId::SidebarWorkTitle => "工作",
+        MessageId::NoActiveWork => "没有活跃的工作",
+        MessageId::ThinkingIdle => "思考空闲",
+        MessageId::MoreReasoningIn => "更多推理按 Ctrl+O",
+        MessageId::FullReasoningIn => "完整推理按 Ctrl+O",
+        MessageId::CmdWebDescription => "发送消息到 Web LLM",
     })
 }
 
@@ -2277,6 +2361,22 @@ fn portuguese_brazil(id: MessageId) -> Option<&'static str> {
         }
         MessageId::OnboardTipsFooterEnter => "Pressione Enter",
         MessageId::OnboardTipsFooterAction => " para abrir o workspace",
+        // Sidebar and task panel labels.
+        MessageId::SidebarTasksTitle => "Tarefas",
+        MessageId::StatusFailed => "falhou",
+        MessageId::StatusCompleted => "concluído",
+        MessageId::StatusRunning => "em execução",
+        MessageId::StatusError => "erro",
+        MessageId::ActivityLabel => "Atividade:",
+        MessageId::NoLiveTools => "Nenhuma ferramenta ativa ou tarefas em segundo plano",
+        MessageId::BackgroundJobs => "tarefas em segundo plano",
+        // Sidebar work panel.
+        MessageId::SidebarWorkTitle => "Trabalho",
+        MessageId::NoActiveWork => "Nenhum trabalho ativo",
+        MessageId::ThinkingIdle => "pensamento ocioso",
+        MessageId::MoreReasoningIn => "Mais raciocínio em Ctrl+O",
+        MessageId::FullReasoningIn => "Raciocínio completo em Ctrl+O",
+        MessageId::CmdWebDescription => "Enviar mensagem para Web LLM",
     })
 }
 
@@ -2665,6 +2765,22 @@ fn spanish_latin_america(id: MessageId) -> Option<&'static str> {
         }
         MessageId::OnboardTipsFooterEnter => "Presiona Enter",
         MessageId::OnboardTipsFooterAction => " para abrir el workspace",
+        // Sidebar and task panel labels.
+        MessageId::SidebarTasksTitle => "Tareas",
+        MessageId::StatusFailed => "falló",
+        MessageId::StatusCompleted => "completado",
+        MessageId::StatusRunning => "en ejecución",
+        MessageId::StatusError => "error",
+        MessageId::ActivityLabel => "Actividad:",
+        MessageId::NoLiveTools => "No hay herramientas activas ni tareas en segundo plano",
+        MessageId::BackgroundJobs => "tareas en segundo plano",
+        // Sidebar work panel.
+        MessageId::SidebarWorkTitle => "Trabajo",
+        MessageId::NoActiveWork => "Sin trabajo activo",
+        MessageId::ThinkingIdle => "pensamiento inactivo",
+        MessageId::MoreReasoningIn => "Más razonamiento en Ctrl+O",
+        MessageId::FullReasoningIn => "Razonamiento completo en Ctrl+O",
+        MessageId::CmdWebDescription => "Enviar mensaje a Web LLM",
     })
 }
 

@@ -1,0 +1,53 @@
+# Web LLM 配置文件模板
+# 复制此文件到 ~/.deepseek/config/web_llm.toml
+
+[web_llm]
+enabled = true
+default_timeout = 120           # 默认响应超时（秒）
+max_retries = 3                 # 最大重试次数
+
+# 通义千问 Web 会话
+[web_llm.qianwen]
+enabled = true
+web_url = "https://www.qianwen.com/"
+cookies_file = "~/.deepseek/cookies/qianwen.json"
+response_timeout = 120          # 最大等待时间（秒）
+retry_count = 3
+
+# 豆包 Web 会话
+[web_llm.doubao]
+enabled = true
+web_url = "https://www.doubao.com/chat/?channel=sysceo&source=mf_db_sysceo"
+cookies_file = "~/.deepseek/cookies/doubao.json"
+response_timeout = 120
+retry_count = 3
+
+# 多轮优化配置
+[web_llm.optimizer]
+enabled = true
+first_draft_llm = "doubao"      # 初稿生成器
+optimizer_llm = "qianwen"       # 优化器
+max_rounds = 2                  # 最大迭代次数（1-2）
+return_final_only = true        # 只返回最终结果
+
+# HTML 解析配置
+[web_llm.parser]
+# 通义千问回答区域选择器
+qianwen_selectors = [
+    ".message-content",
+    ".ai-response",
+    "[data-role='assistant']"
+]
+
+# 豆包回答区域选择器
+doubao_selectors = [
+    ".answer-content",
+    ".bot-message",
+    "[data-type='response']"
+]
+
+# 等待响应配置
+[web_llm.wait]
+poll_interval_ms = 500          # 轮询间隔（毫秒）
+max_wait_seconds = 120          # 最大等待时间（秒）
+completion_indicator = "done"   # 完成标志（根据实际网页调整）

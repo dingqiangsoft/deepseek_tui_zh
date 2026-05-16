@@ -9,6 +9,8 @@
 | [ARCHITECTURE.md](ARCHITECTURE.md) | 代码架构详解 |
 | [CONFIGURATION.md](CONFIGURATION.md) | 完整配置参考 |
 | [MODES.md](MODES.md) | Plan / Agent / YOLO 模式 |
+| [模式和命令指南](模式和命令指南.md) | 🆕 模式和命令完整指南 |
+| [QUICK_COMMANDS.md](../QUICK_COMMANDS.md) | 🆕 快速命令参考卡 |
 | [MCP.md](MCP.md) | Model Context Protocol 集成 |
 | [RUNTIME_API.md](RUNTIME_API.md) | HTTP/SSE API 服务器 |
 | [INSTALL.md](INSTALL.md) | 平台特定安装指南 |

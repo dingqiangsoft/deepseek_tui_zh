@@ -41,6 +41,7 @@ pub mod rlm;
 pub mod schema_sanitize;
 pub mod search;
 pub mod shell;
+pub mod shell_tool;  // New modular shell tool structure
 mod shell_output;
 pub mod skill;
 pub mod spec;

@@ -31,6 +31,7 @@ mod stash;
 mod status;
 mod task;
 mod user_commands;
+mod web;
 
 use std::fmt::Write as _;
 
@@ -526,6 +527,12 @@ pub const COMMANDS: &[CommandInfo] = &[
         usage: "/cache [count|inspect|warmup]",
         description_id: MessageId::CmdCacheDescription,
     },
+    CommandInfo {
+        name: "web",
+        aliases: &["wangluo"],
+        usage: "/web <qianwen|doubao> \"问题\"",
+        description_id: MessageId::CmdWebDescription,
+    },
 ];
 
 /// Execute a slash command
@@ -597,6 +604,9 @@ pub fn execute(cmd: &str, app: &mut App) -> CommandResult {
         "tokens" => debug::tokens(app),
         "cost" => debug::cost(app),
         "cache" => debug::cache(app, arg),
+
+        // Web LLM commands
+        "web" | "wangluo" => web::handle_web_command(app, arg.unwrap_or("")),
 
         // ChangeLog command
         "change" => change::change(app, arg),

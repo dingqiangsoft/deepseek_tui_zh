@@ -250,6 +250,15 @@ enum Commands {
     Sandbox(SandboxArgs),
     /// Run a local server (e.g. MCP)
     Serve(ServeArgs),
+    /// Query web-based AI services (Qianwen, Doubao)
+    Web {
+        /// Platform name (qianwen or doubao)
+        #[arg(value_name = "PLATFORM")]
+        platform: String,
+        /// Question to ask the AI
+        #[arg(value_name = "QUESTION", trailing_var_arg = true, allow_hyphen_values = true)]
+        question: Vec<String>,
+    },
     /// Resume a previous session by ID (use --last for most recent)
     Resume {
         /// Conversation/session id (UUID or prefix)
@@ -870,6 +879,67 @@ async fn main() -> Result<()> {
                 } else {
                     unreachable!("server mode count checked above")
                 }
+            }
+            Commands::Web { platform, question } => {
+                let question = question.join(" ");
+                if question.is_empty() {
+                    bail!("Question cannot be empty. Usage: deepseek web <qianwen|doubao> \"your question\"");
+                }
+                
+                let platform_lower = platform.to_lowercase();
+                let platform_name = match platform_lower.as_str() {
+                    "qianwen" | "千问" => "千问",
+                    "doubao" | "豆包" => "豆包",
+                    _ => bail!("Unknown platform: {}. Supported: qianwen (千问), doubao (豆包)", platform),
+                };
+                
+                println!("🌐 正在向 {} 发送问题...", platform_name);
+                println!("问题: {}\n", question);
+                
+                // 使用独立线程运行浏览器自动化
+                let platform_clone = platform_lower.clone();
+                let question_clone = question.clone();
+                
+                std::thread::spawn(move || {
+                    use std::process::Command;
+                    
+                    // 调用对应的测试程序
+                    let test_bin = if platform_clone == "qianwen" || platform_clone == "千问" {
+                        "qianwen-test"
+                    } else {
+                        "doubao-test"
+                    };
+                    
+                    // 尝试直接执行（如果已安装）
+                    let output = Command::new(test_bin)
+                        .arg(&question_clone)
+                        .output();
+                    
+                    match output {
+                        Ok(out) => {
+                            if out.status.success() {
+                                println!("\n✅ 获取到回复:\n{}", 
+                                    String::from_utf8_lossy(&out.stdout));
+                            } else {
+                                eprintln!("\n❌ 执行失败:\n{}", 
+                                    String::from_utf8_lossy(&out.stderr));
+                            }
+                        }
+                        Err(e) => {
+                            eprintln!("\n⚠ 未找到 {} 命令", test_bin);
+                            eprintln!("请先编译测试程序:");
+                            eprintln!("  cd crates/aiwebllm/{}-test && cargo install --path .", 
+                                if platform_clone.starts_with("qian") || platform_clone.starts_with("千") {
+                                    "qianwen"
+                                } else {
+                                    "doubao"
+                                });
+                        }
+                    }
+                });
+                
+                println!("⏳ 浏览器已启动，请稍候回复...");
+                Ok(())
             }
             Commands::Resume { session_id, last } => {
                 let config = load_config_from_cli(&cli)?;
