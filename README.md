@@ -1,5 +1,7 @@
 # DeepSeek TUI
 
+> **This project extends DeepSeek TUI with: Local LLM support and fully localized Chinese UI.** Built for simplified deployment and Chinese-language workflows.
+
 > Terminal coding agent for DeepSeek V4. It runs from the `deepseek` command, streams reasoning blocks, edits local workspaces with approval gates, and includes an auto mode that chooses both model and thinking level per turn.
 
 **🌏 Localized Versions:**
