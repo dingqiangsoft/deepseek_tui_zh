@@ -1,60 +1,149 @@
-# DeepSeek TUI
+# DeepSeek TUI 中文版
 
-> **面向 [DeepSeek V4](https://platform.deepseek.com) 的终端原生编程智能体：100 万 token 上下文、思考模式流式推理、前缀缓存感知。自包含 Rust 二进制发布——开箱即带 MCP 客户端、沙箱和持久化任务队列。**
+> **本地化部署的中文终端编程智能体 | 100 万 token 上下文 | 思考模式流式推理 | 前缀缓存感知 | 开箱即用的 MCP 客户端、沙箱和持久化任务队列**
 
 [English README](README.md)
 [日本語 README](README.ja-JP.md)
 
-## 安装
+---
 
-`deepseek` 是自包含 Rust 二进制——**运行时不依赖 Node.js 或 Python**。
-下面几种方式装出来的是同一套二进制，按你已有的工具链选一个即可：
+## 🎯 项目定位
+
+**DeepSeek TUI 中文版**是一个完全本地化部署的终端 AI 编程助手，专为中文用户优化：
+
+- ✅ **完全中文化** - UI 界面、文档、提示信息全部中文
+- ✅ **本地化部署** - 支持本地 LLM、局域网 LLM、云端 API
+- ✅ **简化安装** - 一键安装脚本，无需复杂配置
+- ✅ **智能增强** - 针对中文编程场景优化的提示词和工作流
+- ✅ **免费方案** - 后期将集成免费 Web 版 LLM 会话功能
+
+> 📚 **新用户？从这里开始**：
+> - [快速开始.md](快速开始.md) - 3 分钟快速上手
+> - [docs/zh/安装指南.md](docs/zh/安装指南.md) - 完整安装指南
+> - [操作手册.md](操作手册.md) - 详细使用手册
+
+## 🚀 快速安装
+
+> ⚠️ **重要**：本项目必须编译后才能使用！
+
+### 方式一：一键安装（推荐）
 
 ```bash
-# 1. npm —— 已装 Node 的最方便方式。npm 包只是一个下载器，
-#    会从 GitHub Releases 拉取对应平台的预编译二进制，
-#    并不会让 deepseek 本身依赖 Node 运行时。
+# 切换到项目目录
+cd "F:\ai\codes\github\deepseektuizh"
+
+# 一键编译安装
+cargo install --path crates/cli --locked --force
+cargo install --path crates/tui --locked --force
+
+# 验证安装
+deepseek --version
+```
+
+### 方式二：使用启动脚本
+
+```powershell
+# Windows 用户直接运行启动菜单
+.\start-menu.ps1
+```
+
+### 其他安装方式
+
+<details>
+<summary>npm 安装（需要 Node.js）</summary>
+
+```bash
 npm install -g deepseek-tui
-
-# 2. Cargo —— 无需 Node。
-cargo install deepseek-tui-cli --locked   # `deepseek` 入口
-cargo install deepseek-tui     --locked   # `deepseek-tui` TUI 二进制
-
-# 3. Homebrew —— macOS 包管理器。
-brew tap Hmbown/deepseek-tui
-brew install deepseek-tui
-
-# 4. 直接下载 —— 无需任何工具链。
-#    https://github.com/Hmbown/DeepSeek-TUI/releases
-#    覆盖 Linux x64/ARM64、macOS x64/ARM64、Windows x64
-
-# 5. Docker —— 预构建发布镜像。
-docker volume create deepseek-tui-home
-docker run --rm -it \
-  -e DEEPSEEK_API_KEY="$DEEPSEEK_API_KEY" \
-  -v deepseek-tui-home:/home/deepseek/.deepseek \
-  -v "$PWD:/workspace" \
-  -w /workspace \
-  ghcr.io/hmbown/deepseek-tui:latest
 ```
+</details>
 
-> 中国大陆访问较慢时，npm 可加 `--registry=https://registry.npmmirror.com`，
-> 或使用下方的 [Cargo 镜像](#中国大陆--镜像友好安装)。
->
-> 下载安全：官方二进制只发布在
-> `https://github.com/Hmbown/DeepSeek-TUI/releases`。手动下载时请校验
-> SHA-256 manifest，并避免相似仓库名或搜索结果里的镜像站。详见
-> [下载安全与校验](docs/INSTALL.md#2-download-safety-and-checksums)。
-
-已经安装过？按你的安装方式更新：
+<details>
+<summary>从源码安装（完整步骤）</summary>
 
 ```bash
-deepseek update                         # release 二进制更新器
-npm install -g deepseek-tui@latest      # npm 包装器
-brew update && brew upgrade deepseek-tui
-cargo install deepseek-tui-cli --locked --force
-cargo install deepseek-tui     --locked --force
+# 1. 克隆仓库
+git clone https://github.com/Hmbown/DeepSeek-TUI.git
+cd DeepSeek-TUI
+
+# 2. 安装 Rust（如果未安装）
+# 访问 https://rustup.rs/ 
+
+# 3. 编译安装
+cargo install --path crates/cli --locked
+cargo install --path crates/tui --locked
+
+# 4. 验证
+deepseek --version
 ```
+</details>
+
+<details>
+<summary>中国大陆镜像加速</summary>
+
+如果下载缓慢，配置 Cargo 镜像：
+
+```toml
+# ~/.cargo/config.toml
+[source.crates-io]
+replace-with = "tuna"
+
+[source.tuna]
+registry = "sparse+https://mirrors.tuna.tsinghua.edu.cn/crates.io-index/"
+```
+</details>
+
+---
+
+## 💡 本地化部署方案
+
+### 方案一：本地 LLM（免费）
+
+适合有本地 AI 模型的用户（如 llama.cpp、Ollama）：
+
+```powershell
+# 使用启动脚本
+.\start-local-llm.ps1
+
+# 或手动配置
+$env:DEEPSEEK_PROVIDER = "openai"
+$env:DEEPSEEK_BASE_URL = "http://192.168.2.5:1234/v1"
+$env:DEEPSEEK_MODEL = "your-local-model"
+$env:DEEPSEEK_API_KEY = "not-needed"
+$env:DEEPSEEK_ALLOW_INSECURE_HTTP = "1"
+deepseek
+```
+
+**优势**：
+- ✅ 完全免费
+- ✅ 数据隐私安全
+- ✅ 离线可用
+
+### 方案二：DeepSeek 官方 API（推荐）
+
+适合需要最强能力的用户：
+
+```bash
+# 首次设置 API Key
+deepseek auth set --provider deepseek
+
+# 启动
+deepseek --model auto
+```
+
+**优势**：
+- ✅ 最强推理能力
+- ✅ 100 万 token 上下文
+- ✅ 按量付费，成本低
+
+### 方案三：免费 Web 版 LLM（后期开发）
+
+🔜 **规划中**：集成免费 Web 版 LLM 会话功能
+
+- 无需 API Key
+- 无需本地模型
+- 适合轻度使用
+
+---
 
 [![CI](https://github.com/Hmbown/DeepSeek-TUI/actions/workflows/ci.yml/badge.svg)](https://github.com/Hmbown/DeepSeek-TUI/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/deepseek-tui)](https://www.npmjs.com/package/deepseek-tui)
@@ -65,212 +154,144 @@ cargo install deepseek-tui     --locked --force
 
 ---
 
-## 这是什么？
+## ✨ 核心特性
 
-DeepSeek TUI 是一个完全运行在终端里的编程智能体。它让 DeepSeek 前沿模型直接访问你的工作区：读写文件、运行 shell 命令、搜索浏览网页、管理 git、调度子智能体——全部通过快速、键盘驱动的 TUI 完成。
+### 🌐 完全中文化
+- **UI 界面** - 所有菜单、提示、错误信息全部中文
+- **完整文档** - 安装指南、操作手册、界面说明全部中文
+- **中文优化** - 针对中文编程场景优化的提示词
 
-它面向 **DeepSeek V4**（`deepseek-v4-pro` / `deepseek-v4-flash`）构建，原生支持 100 万 token 上下文窗口和思考模式流式输出。
+### 🏠 本地化部署
+- **本地 LLM** - 支持 llama.cpp、Ollama 等本地模型
+- **局域网 LLM** - 支持局域网内的 AI 服务
+- **云端 API** - 支持 DeepSeek 官方及其他云端服务
+- **灵活切换** - 一键切换不同部署方案
 
-### 主要功能
+### 🎨 智能增强
+- **Auto 模式** - 自动选择最佳模型和推理强度
+- **思考流式输出** - 实时观察 AI 推理过程
+- **中文思维链** - 中文提问，中文思考，中文回答
+- **100 万 token 上下文** - 超长对话记忆
 
-- **Auto 模式** —— `--model auto` / `/model auto` 每轮自动选择模型和推理强度
-- **原生 RLM**（`rlm_open`/`rlm_eval`）—— 持久化 REPL 会话用于批量分析；使用带界面的辅助函数（`peek`、`search`、`chunk`、`sub_query_batch`）运行低成本 `deepseek-v4-flash` 子任务
-- **思考模式流式输出** —— 实时观察模型在解决问题时的思维链展开
-- **完整工具集** —— 文件操作、shell 执行、git、网页搜索/浏览、apply-patch、子智能体、MCP 服务器
-- **100 万 token 上下文** —— 上下文跟踪、手动或配置驱动的压缩，以及前缀缓存遥测
-- **前缀缓存稳定性跟踪** —— 可选 `/statusline` footer chip 显示最近轮次缓存前缀的稳定程度
-- **三种交互模式** —— Plan（只读探索）、Agent（带审批的默认交互）、YOLO（可信工作区自动批准）
-- **推理强度档位** —— 用 `Shift+Tab` 在 `off → high → max` 之间切换
-- **会话保存和恢复** —— 长任务的断点续作
-- **工作区回滚** —— 通过 side-git 记录每轮前后快照，支持 `/restore` 和 `revert_turn`，不影响项目自己的 `.git`
-- **持久化任务队列** —— 后台任务在重启后仍然存在，支持计划任务和长时间运行的操作
-- **HTTP/SSE 运行时 API** —— `deepseek serve --http` 用于无界面智能体流程
-- **MCP 协议** —— 连接 Model Context Protocol 服务器扩展工具，见 [docs/MCP.md](docs/MCP.md)
-- **LSP 诊断** —— 每次编辑后通过 rust-analyzer、pyright、typescript-language-server、gopls、clangd 提供内联错误/警告
-- **用户记忆** —— 可选的持久化笔记文件注入系统提示，实现跨会话偏好保持
-- **多语言 UI** —— 支持 `en`、`ja`、`zh-Hans`、`pt-BR`，支持自动检测
-- **实时成本跟踪** —— 按轮次和会话统计 token 用量与成本估算，含缓存命中/未命中明细；简体中文 locale 下显示 CNY
-- **技能系统** —— 可通过 GitHub 安装的组合式指令包；首次启动自带 `skill-creator`、`mcp-builder`、`documents`、`presentations`、`spreadsheets`、`pdf`、`feishu` 等 starter skills
-- **终端原生通知** —— OSC 9、OSC 99、OSC 777，以及桌面通知兜底
-- **内置主题选择器** —— Catppuccin、Tokyo Night、Dracula、Gruvbox 和原有亮/暗色主题，可用 `/theme` 实时切换
+### 🛠️ 简化工具
+- **一键安装** - 简单几条命令完成安装
+- **启动脚本** - 预设多种启动方案
+- **配置向导** - 首次启动自动引导配置
+- **故障诊断** - `deepseek doctor` 一键检查状态
 
 ---
 
-## 架构说明
+## 📐 界面布局
 
-`deepseek`（调度器 CLI）→ `deepseek-tui`（伴随二进制）→ ratatui 界面 ↔ 异步引擎 ↔ OpenAI 兼容流式客户端。工具调用通过类型化注册表（shell、文件操作、git、web、子智能体、MCP、RLM）路由，结果流式返回对话记录。引擎管理会话状态、轮次追踪、持久化任务队列和 LSP 子系统——它在下一步推理前将编辑后诊断反馈到模型上下文中。
+采用清晰的双栏布局设计：
 
-详见 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)。
+```
+┌──────────────────────────────────────┬──────────────────────────────┐
+│         顶部状态栏                    │        Tasks (任务面板)      │
+│  [模式] [模型] [成本] [缓存]         │  - 当前任务状态              │
+├──────────────────────────────────────┤  - 后台作业列表              │
+│                                       │  - 错误日志                  │
+│         主对话区 (左侧)               │  - 活动记录                  │
+│         - 对话历史                     │  - 子代理状态                │
+│         - AI 回复                     │                              │
+│         - 工具调用                     │                              │
+│         - 思考过程                     │                              │
+│                                       │                              │
+├──────────────────────────────────────┤                              │
+│         输入区 (底部)                 │                              │
+│  > 在这里输入您的问题...              │                              │
+└──────────────────────────────────────┴──────────────────────────────┘
+```
 
-### 子智能体：并发后台执行
-
-DeepSeek TUI 可以同时调度多个子智能体并行运行——类似于并发任务队列：
-
-- **非阻塞启动。** `agent_open` 立即返回。子智能体获得独立的上下文和工具注册表，独立运行。父进程继续工作。
-- **后台执行。** 子智能体并发运行（默认上限 10，可配置至 20）。引擎管理线程池——无需轮询循环。
-- **完成通知。** 子智能体完成后，运行时发送结构化的 `<deepseek:subagent.done>` 事件，包含摘要、证据列表和执行指标。父模型读取 `summary` 字段并整合结果。
-- **按需读取结果。** 大型对话记录暂存为 `var_handle` 引用。模型通过 `handle_read` 按切片、范围或 JSONPath 投影读取——保持父上下文精简。
-
-详见 [docs/SUBAGENTS.md](docs/SUBAGENTS.md)。
+> 📚 详细布局说明：[docs/zh/界面布局说明.md](docs/zh/界面布局说明.md)
 
 ---
 
-## 快速开始
+## 🚦 三种工作模式
 
-```bash
-npm install -g deepseek-tui
-deepseek --version
-deepseek --model auto
-```
+| 模式 | 图标 | 说明 | 适用场景 |
+|------|------|------|---------|
+| **Plan** | 🔍 | 只读调查，不修改文件 | 代码审查、问题诊断 |
+| **Agent** | 🤖 | 交互式，需要批准（默认） | 日常编程 |
+| **YOLO** | ⚡ | 自动批准所有操作 | 受信任的工作环境 |
 
-预构建二进制覆盖 **Linux x64**、**Linux ARM64**（v0.8.8 起）、**macOS x64**、**macOS ARM64** 和 **Windows x64**。其他目标平台（musl、riscv64、FreeBSD 等）请见下方的[从源码安装](#从源码安装)或 [docs/INSTALL.md](docs/INSTALL.md)。
+---
 
-首次启动时会提示输入 [DeepSeek API key](https://platform.deepseek.com/api_keys)。密钥保存到 `~/.deepseek/config.toml`，在任意目录、IDE 终端和脚本中都能使用，不会触发系统密钥环弹窗。
+## ⌨️ 常用快捷键
 
-也可以提前配置：
+| 快捷键 | 功能 |
+|--------|------|
+| `Tab` | 切换工作模式 / 自动补全 |
+| `Shift+Tab` | 切换推理深度 (off → high → max) |
+| `Enter` | 发送消息 |
+| `Shift+Enter` | 换行 |
+| `Ctrl+K` | 命令面板 |
+| `Ctrl+R` | 恢复旧会话 |
+| `Esc` | 取消/返回 |
+| `/help` | 显示帮助 |
+| `/theme` | 切换主题 |
+| `/compact` | 压缩上下文 |
 
-```bash
-deepseek auth set --provider deepseek   # 保存到 ~/.deepseek/config.toml
+> 📚 完整快捷键列表：[docs/KEYBINDINGS.md](docs/KEYBINDINGS.md)
 
-deepseek auth status                    # 显示当前活跃的凭证来源
-export DEEPSEEK_API_KEY="YOUR_KEY"      # 环境变量方式；需要在非交互式 shell 中使用请放入 ~/.zshenv
-deepseek
+---
 
-deepseek doctor                          # 验证安装
-```
+## 🔮 后期开发规划
 
-> 轮换或移除密钥：`deepseek auth clear --provider deepseek`。
+### 🎯 即将推出的功能
 
-### 腾讯云 / CNB 远程优先路径
+#### 1. 免费 Web 版 LLM 集成
+- **目标**：无需 API Key、无需本地模型即可使用
+- **方案**：集成免费 Web 版 LLM 会话功能
+- **适用**：轻度用户、快速体验、临时任务
 
-如果你想要一个长期在线、可从手机控制的工作区，推荐使用腾讯云原生路径：
-CNB 镜像/源码，腾讯云 Lighthouse 香港实例，飞书/Lark 长连接桥接，
-以及可选的 EdgeOne 公网 HTTPS 边缘。运行时 API 必须绑定在 localhost；
-不要通过 EdgeOne 暴露 `/v1/*`。
+#### 2. 一键安装器
+- **目标**：简化安装流程
+- **功能**：
+  - 自动检测系统环境
+  - 自动安装 Rust 工具链
+  - 一键编译安装
+  - 自动配置环境变量
 
-先看 [docs/TENCENT_CLOUD_REMOTE_FIRST.md](docs/TENCENT_CLOUD_REMOTE_FIRST.md)，
-再按 [docs/TENCENT_LIGHTHOUSE_HK.md](docs/TENCENT_LIGHTHOUSE_HK.md) 配置服务器。
+#### 3. 图形化配置向导
+- **目标**：零配置门槛
+- **功能**：
+  - 可视化选择部署方案
+  - 自动测试连接
+  - 一键应用配置
 
-### Auto 模式
+#### 4. 中文 Skill 市场
+- **目标**：丰富的中文编程技能包
+- **内容**：
+  - 中文代码规范
+  - 中文文档模板
+  - 中文测试框架
+  - 中文项目脚手架
 
-使用 `deepseek --model auto` 或 `/model auto` 让 DeepSeek TUI 自行决定每轮需要多少模型和推理能力。
+---
 
-Auto 模式同时控制两个设置：
+## 📚 文档导航
 
-- 模型：`deepseek-v4-flash` 或 `deepseek-v4-pro`
-- 推理强度：`off`、`high` 或 `max`
+### 新手入门
+- [快速开始.md](快速开始.md) - 3 分钟快速上手 ⭐ 推荐
+- [docs/zh/安装指南.md](docs/zh/安装指南.md) - 完整安装指南
+- [操作手册.md](操作手册.md) - 详细使用手册
 
-在真实请求发出之前，应用会先用关闭推理的 `deepseek-v4-flash` 进行一次小型路由调用。路由器审视最新请求和最近的上下文，然后为真实请求选定具体的模型和推理强度。简短/简单的轮次保持在 Flash + 关闭推理；编码、调试、发布、架构、安全审查或模糊的多步骤任务可升级到 Pro 和/或更高推理强度。
+### 进阶使用
+- [docs/zh/界面布局说明.md](docs/zh/界面布局说明.md) - 界面布局详解
+- [docs/zh/CONFIGURATION_GUIDE.md](docs/zh/CONFIGURATION_GUIDE.md) - 配置指南
+- [docs/MODES.md](docs/MODES.md) - 工作模式说明
 
-`auto` 是 DeepSeek TUI 本地行为。上游 API 永远不会收到 `model: "auto"`，它只会收到为当前轮次选定的具体模型和推理强度设置。TUI 会显示选定的路由，成本跟踪按实际运行的模型计费。如果路由调用失败或返回无效答案，应用会回退到本地启发式规则。子智能体会继承 auto 模式，除非你为它们指定了显式模型。
+### 完整文档
+| 文档 | 说明 |
+|------|------|
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | 代码架构详解 |
+| [MCP.md](docs/MCP.md) | MCP 协议集成 |
+| [SUBAGENTS.md](docs/SUBAGENTS.md) | 子智能体指南 |
+| [KEYBINDINGS.md](docs/KEYBINDINGS.md) | 完整快捷键列表 |
+| [CHANGELOG.md](CHANGELOG.md) | 更新历史 |
 
-需要可重复基准测试、严格控制成本上限或特定提供商/模型映射时，请使用固定模型或固定推理强度。
-
-### Linux ARM64（HarmonyOS 轻薄本、openEuler、Kylin、树莓派、Graviton 等）
-
-从 v0.8.8 起，`npm i -g deepseek-tui` 直接支持 glibc 系的 ARM64 Linux。你也可以从 [Releases 页面](https://github.com/Hmbown/DeepSeek-TUI/releases) 下载预编译二进制，放到 `PATH` 目录中。
-
-### 中国大陆 / 镜像友好安装
-
-如果在中国大陆访问 GitHub 或 npm 下载较慢，可以通过 Cargo 注册表镜像安装：
-
-```toml
-# ~/.cargo/config.toml
-[source.crates-io]
-replace-with = "tuna"
-
-[source.tuna]
-registry = "sparse+https://mirrors.tuna.tsinghua.edu.cn/crates.io-index/"
-```
-
-然后安装两个二进制（调度器在运行时会调用 TUI）：
-
-```bash
-cargo install deepseek-tui-cli --locked   # 提供推荐入口 `deepseek`
-cargo install deepseek-tui     --locked   # 提供交互式 TUI 伴随二进制
-deepseek --version
-```
-
-也可以直接从 [GitHub Releases](https://github.com/Hmbown/DeepSeek-TUI/releases) 下载预编译二进制。`DEEPSEEK_TUI_RELEASE_BASE_URL` 可用于镜像后的 release 资产。
-
-### Windows (Scoop)
-
-[Scoop](https://scoop.sh) 是一个 Windows 软件包管理器。DeepSeek TUI 已进入
-Scoop main bucket，但该 manifest 独立更新，可能滞后于 GitHub/npm/Cargo
-release。先运行 `scoop update`，安装后用 `deepseek --version` 核对版本：
-
-```bash
-scoop update
-scoop install deepseek-tui
-deepseek --version
-```
-
-如果需要最新版本，请优先使用 npm 或直接下载 GitHub Release 资产。
-
-
-<details id="install-from-source">
-<summary>从源码安装</summary>
-
-适用于任何 Tier-1 Rust 目标，包括 musl、riscv64、FreeBSD 以及尚无预编译包的 ARM64 发行版。
-
-```bash
-# Linux 构建依赖（Debian/Ubuntu/RHEL）：
-#   sudo apt-get install -y build-essential pkg-config libdbus-1-dev
-#   sudo dnf install -y gcc make pkgconf-pkg-config dbus-devel
-
-git clone https://github.com/Hmbown/DeepSeek-TUI.git
-cd DeepSeek-TUI
-
-cargo install --path crates/cli --locked   # 需要 Rust 1.88+；提供 `deepseek`
-cargo install --path crates/tui --locked   # 提供 `deepseek-tui`
-```
-
-两个二进制都需要安装。交叉编译和平台特定说明见 [docs/INSTALL.md](docs/INSTALL.md)。
-
-</details>
-
-### 其他模型提供方
-
-```bash
-# NVIDIA NIM
-deepseek auth set --provider nvidia-nim --api-key "YOUR_NVIDIA_API_KEY"
-deepseek --provider nvidia-nim
-
-# AtlasCloud
-deepseek auth set --provider atlascloud --api-key "YOUR_ATLASCLOUD_API_KEY"
-deepseek --provider atlascloud
-
-# OpenRouter
-deepseek auth set --provider openrouter --api-key "YOUR_OPENROUTER_API_KEY"
-deepseek --provider openrouter --model deepseek/deepseek-v4-pro
-
-# Novita
-deepseek auth set --provider novita --api-key "YOUR_NOVITA_API_KEY"
-deepseek --provider novita --model deepseek/deepseek-v4-pro
-
-# Fireworks
-deepseek auth set --provider fireworks --api-key "YOUR_FIREWORKS_API_KEY"
-deepseek --provider fireworks --model deepseek-v4-pro
-
-# 通用 OpenAI 兼容端点
-deepseek auth set --provider openai --api-key "YOUR_OPENAI_COMPATIBLE_API_KEY"
-OPENAI_BASE_URL="https://openai-compatible.example/v4" deepseek --provider openai --model glm-5
-
-# 自托管 SGLang
-SGLANG_BASE_URL="http://localhost:30000/v1" deepseek --provider sglang --model deepseek-v4-flash
-
-# 自托管 vLLM
-VLLM_BASE_URL="http://localhost:8000/v1" deepseek --provider vllm --model deepseek-v4-flash
-
-# 自托管 Ollama
-ollama pull deepseek-coder:1.3b
-deepseek --provider ollama --model deepseek-coder:1.3b
-```
-
-在 TUI 内，`/provider` 打开提供方选择器，`/model` 打开模型选择器。
-`/provider openrouter` 和 `/model <id>` 可直接切换；`/models` 会列出
-API 返回的实时模型。`/model` 选择器会优先使用当前提供方的实时模型
-目录，不可用时再回退到 provider-aware 默认模型列表。
+> 📚 更多文档：[docs/zh/README.md](docs/zh/README.md)
 
 ---
 

@@ -2,8 +2,9 @@
 
 > Terminal coding agent for DeepSeek V4. It runs from the `deepseek` command, streams reasoning blocks, edits local workspaces with approval gates, and includes an auto mode that chooses both model and thinking level per turn.
 
-[简体中文 README](README.zh-CN.md)
-[日本語 README](README.ja-JP.md)
+**🌏 Localized Versions:**
+- [🇨🇳 简体中文 - 本地化部署中文版](README.zh-CN.md) - 完全中文化、简化安装、本地化部署
+- [🇯🇵 日本語 README](README.ja-JP.md)
 
 ## Install
 
@@ -584,4 +585,3 @@ Support: [Buy me a coffee](https://www.buymeacoffee.com/hmbown).
 ## Star History
 
 [![Star History Chart](https://api.star-history.com/chart?repos=Hmbown/DeepSeek-TUI&type=date&legend=top-left)](https://www.star-history.com/?repos=Hmbown%2FDeepSeek-TUI&type=date&logscale=&legend=top-left)
-# deepseek_tui_zh
