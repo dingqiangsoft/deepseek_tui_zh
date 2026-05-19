@@ -1,0 +1,31 @@
+# AICodeClaw MCP 配置文件
+# 用于腾讯云 WorkBuddy 集成
+
+# MCP Server 配置
+[mcp]
+enabled = true
+
+# AICodeClaw MCP Server 定义
+[[mcp.servers]]
+name = "aicodclaw"
+command = "aicodclaw"
+args = ["mcp", "stdio"]
+enabled = true
+
+# 环境变量配置
+[mcp.servers.env]
+# 本地模型配置（私域化）
+DEEPSEEK_PROVIDER = "openai"
+DEEPSEEK_BASE_URL = "http://localhost:11434/v1"
+DEEPSEEK_MODEL = "qwen3.5-9b-deepseek-v4-flash@q6_k"
+DEEPSEEK_API_KEY = "not-needed"
+
+# 允许不安全的 HTTP（用于局域网）
+DEEPSEEK_ALLOW_INSECURE_HTTP = "1"
+
+# 工具过滤器（可选）
+[mcp.servers.filter]
+# 允许的工具列表（留空表示允许所有）
+allow = []
+# 拒绝的工具列表
+deny = []

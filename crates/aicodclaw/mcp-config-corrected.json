@@ -1,0 +1,21 @@
+{
+  "mcpServers": {
+    "connector-proxy": {
+      "type": "http",
+      "url": "http://127.0.0.1:51118/mcp",
+      "description": "Aggregated proxy containing MCP servers: none"
+    },
+    "aicodclaw": {
+      "command": "F:\\ai\\codes\\github\\deepseektuizh\\target\\release\\deepseek.exe",
+      "args": ["serve", "--mcp"],
+      "env": {
+        "DEEPSEEK_PROVIDER": "openai",
+        "DEEPSEEK_BASE_URL": "http://localhost:11434/v1",
+        "DEEPSEEK_MODEL": "qwen3.5-9b-deepseek-v4-flash@q6_k",
+        "DEEPSEEK_API_KEY": "not-needed",
+        "DEEPSEEK_ALLOW_INSECURE_HTTP": "1"
+      },
+      "disabled": false
+    }
+  }
+}

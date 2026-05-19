@@ -1,0 +1,30 @@
+{
+  "name": "AICodeClawTokenGuard",
+  "version": "1.0.0",
+  "description": "让 WorkBuddy 调用 AICodeClaw Node.js MCP Server，减少 90-95% Token 消耗，支持 YOLO 批量模式",
+  "author": "AICodeClaw Team",
+  "license": "MIT",
+  "tags": ["token-saving", "aicodclaw", "mcp", "cost-reduction", "nodejs", "yolo-mode"],
+  "category": "optimization",
+  "main": "SKILL.md",
+  "mcp_tools": [
+    "aicodclaw_file_read",
+    "aicodclaw_file_write",
+    "aicodclaw_search",
+    "aicodclaw_apply_patch",
+    "aicodclaw_shell",
+    "aicodclaw_deepseek",
+    "aicodclaw_deepseek-reply",
+    "aicodclaw_yolo"
+  ],
+  "configuration": {
+    "auto_invoke": true,
+    "prefer_aicodclaw": true,
+    "mcp_server": "node index.js",
+    "yolo_mode": true
+  },
+  "metrics": {
+    "token_savings": "90-95%",
+    "avg_cost_per_task": "0.5-2 积分"
+  }
+}

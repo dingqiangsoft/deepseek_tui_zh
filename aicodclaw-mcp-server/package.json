@@ -1,0 +1,23 @@
+{
+  "name": "aicodclaw-mcp-server",
+  "version": "1.0.0",
+  "description": "AICodeClaw MCP Server - Reduces WorkBuddy token consumption by 90-95%",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "mcp",
+    "aicodclaw",
+    "workbuddy",
+    "token-saving"
+  ],
+  "author": "AICodeClaw Team",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.4.3"
+  }
+}

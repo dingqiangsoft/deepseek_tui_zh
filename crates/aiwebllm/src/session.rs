@@ -207,7 +207,7 @@ impl Session {
     }
     
     async fn poll_dom(&mut self) -> Result<(), WebLlmError> {
-        let mut last_html = String::new();
+        let _last_html = String::new();
         let mut wait_time = self.polling_config.initial_delay.as_millis() as u64;
         
         loop {
@@ -246,6 +246,6 @@ mod tests {
         let mut usage = TokenUsage::default();
         assert_eq!(usage.last_reset, 0);
         usage.reset();
-        assert!(!usage.last_reset.is_zero());
+        assert!(usage.last_reset != 0);
     }
 }

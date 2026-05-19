@@ -1,0 +1,42 @@
+# AICodeClaw 配置文件示例
+# 复制此文件为 config.toml 即可使用默认配置
+
+# API 提供商设置
+[provider]
+model = "deepseek-v4-flash"
+base_url = "https://api.deepseek.com/beta"
+api_key = "your-api-key-here"  # 从环境变量读取，或手动输入
+
+# MCP（Model Context Protocol）集成配置
+[mcp]
+enabled = true
+timeout_connect = 10
+timeout_execute = 60
+timeout_read = 120
+
+# Sub-agent 并行执行限制
+[agent_pool]
+max_concurrent = 10
+default_timeout_ms = 30000
+
+# 私域化安全设置（零泄露核心）
+safety {
+    # 是否启用本地数据隔离
+    local_execution_only = true
+    # 是否禁止上传敏感数据到云端
+    forbid_cloud_upload = true
+}
+
+# TUI 界面配置
+[tui]
+enabled = true
+language = "zh-CN"
+theme = "dark"
+
+# CLI 命令别名（快速启动）
+[cli]
+shortcuts {
+    web_search = "/web qianwen "
+    agent_open = "/agent_open "
+    agent_eval = "/agent_eval "
+}

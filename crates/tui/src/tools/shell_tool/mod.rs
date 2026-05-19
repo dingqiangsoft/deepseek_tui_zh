@@ -4,7 +4,7 @@
 //! risk assessment, permission checks, and progress tracking.
 
 use crate::tools::spec::ToolContext;
-use anyhow::{Result, Context};
+use anyhow::Result;
 
 /// Risk level for shell commands
 #[derive(Debug, Clone, PartialEq)]

@@ -1136,6 +1136,11 @@ pub struct App {
     /// Derived title for the current session shown in the composer border.
     /// Updated when `EngineEvent::SessionUpdated` fires or a saved session is loaded.
     pub session_title: Option<String>,
+
+    // === Web LLM Clients (浏览器自动化) ===
+    /// 存储 Web LLM 客户端实例（千问、豆包等）
+    /// 保持浏览器活动状态，避免每次查询都重新启动
+    pub web_llm_clients: HashMap<String, deepseek_aiwebllm::web_llm_client::WebLlmClient>,
 }
 
 /// Message queued while the engine is busy.
@@ -1639,6 +1644,7 @@ impl App {
                 .and_then(|tui| tui.composer_arrows_scroll)
                 .unwrap_or_else(|| default_composer_arrows_scroll(use_mouse_capture)),
             session_title: None,
+            web_llm_clients: HashMap::new(),
         }
     }
 

@@ -233,7 +233,8 @@ impl McpServer {
                 }
             }
         }
-        json!({ "tools": tools, "nextCursor": Value::Null })
+        // MCP 协议要求：如果没有分页，不包含 nextCursor 字段
+        json!({ "tools": tools })
     }
 
     fn list_resources_response(&self) -> Value {
@@ -258,7 +259,8 @@ impl McpServer {
             }
         }
 
-        json!({ "resources": resources, "nextCursor": Value::Null })
+        // MCP 协议要求：如果没有分页，不包含 nextCursor 字段
+        json!({ "resources": resources })
     }
 
     fn call_tool(

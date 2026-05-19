@@ -5,6 +5,9 @@ use tracing::{info, warn};
 
 use crate::error::WebLlmError;
 
+pub mod doubao;  // 豆包客户端（已实现）
+pub use doubao::DoubaoClient;
+
 /// Browser Controller - Complete headless Chrome automation with localStorage extraction
 #[derive(Debug)]
 pub struct BrowserController {
